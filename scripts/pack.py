@@ -26,6 +26,7 @@ def package_bytes(source: Path) -> tuple[str, bytes]:
             if entry not in file_map or len(file_map[entry]) > 128 * 1024:
                 raise ValueError("Missing or oversized JavaScript entry")
     if "LICENSE" not in file_map:
+        # Preserve a package's original license bytes when it supplies one.
         files.append(("LICENSE", (ROOT / "LICENSE").read_bytes()))
     output = io.BytesIO()
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
@@ -38,14 +39,45 @@ def package_bytes(source: Path) -> tuple[str, bytes]:
     return f"{manifest['id']}-{manifest['version']}.moduplugin", output.getvalue()
 
 
+def reviewed_packages(root: Path) -> list[tuple[str, bytes]]:
+    catalog = json.loads((root / "catalog.source.json").read_text(encoding="utf-8"))
+    if catalog["schemaVersion"] != 1:
+        raise ValueError("Unsupported catalog schema")
+    packages = []
+    seen = set()
+    for entry in catalog["plugins"]:
+        if entry["status"] != "reviewed":
+            continue
+        identity = (entry["id"], entry["version"])
+        if identity in seen:
+            raise ValueError("Duplicate catalog version")
+        seen.add(identity)
+        source = (root / entry["sourcePath"]).resolve()
+        if not source.is_relative_to((root / "packages").resolve()):
+            raise ValueError("Catalog source must be inside packages")
+        manifest = json.loads((source / "manifest.json").read_text(encoding="utf-8"))
+        if any(manifest[key] != entry[key] for key in ("id", "version", "minAppVersion")):
+            raise ValueError("Catalog identity differs from manifest")
+        if manifest.get("hostApi", 1) != entry["hostApi"] or set(manifest["capabilities"]) != set(entry["capabilities"]):
+            raise ValueError("Catalog API or capabilities differ from manifest")
+        name, data = package_bytes(source)
+        if (entry["package"]["path"] != f"dist/{name}" or
+                entry["package"]["sha256"] != hashlib.sha256(data).hexdigest()):
+            raise ValueError("Package differs from reviewed catalog")
+        with zipfile.ZipFile(io.BytesIO(data)) as archive:
+            files = {name: hashlib.sha256(archive.read(name)).hexdigest() for name in archive.namelist()}
+        if files != entry["files"]:
+            raise ValueError("File inventory differs from reviewed catalog")
+        packages.append((name, data))
+    return packages
+
+
 def main() -> None:
+    packages = reviewed_packages(ROOT)
     destination = ROOT / "dist"
     destination.mkdir(exist_ok=True)
     sums = []
-    for source in sorted((ROOT / "packages").iterdir()):
-        if not source.is_dir():
-            continue
-        name, data = package_bytes(source)
+    for name, data in packages:
         (destination / name).write_bytes(data)
         sums.append(f"{hashlib.sha256(data).hexdigest()}  {name}\n")
         print(name)
