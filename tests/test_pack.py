@@ -18,7 +18,9 @@ SPEC.loader.exec_module(PACK)
 class PackageTest(unittest.TestCase):
     def test_repeatable_packages_include_license_and_entries(self):
         sources = sorted((ROOT / "packages").iterdir())
-        self.assertEqual({path.name for path in sources}, {"private-books", "text-tools", "prompt-pack"})
+        self.assertEqual({path.name for path in sources}, {
+            "private-books", "text-tools", "prompt-pack", "dictionary-transform", "web-clipper"
+        })
         for source in sources:
             first = PACK.package_bytes(source)
             self.assertEqual(first, PACK.package_bytes(source))
@@ -38,9 +40,9 @@ class PackageTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 PACK.package_bytes(source)
 
-    def test_catalog_covers_three_reviewed_packages_and_preserves_existing_bytes(self):
+    def test_catalog_covers_five_reviewed_packages_and_preserves_existing_bytes(self):
         packages = dict(PACK.reviewed_packages(ROOT))
-        self.assertEqual(len(packages), 3)
+        self.assertEqual(len(packages), 5)
         expected = {
             "com.modu.private-books-1.0.0.moduplugin": "ce459c352a302b3dc1b7e5b3fade872c5dec3ef53a533747674bb4b038b0eba4",
             "com.modu.text-tools-1.0.0.moduplugin": "19ec63c7ab15d2b9895ee48c5c46e1493247197e8d3cea29746d34beece0717e",
@@ -62,7 +64,7 @@ class PackageTest(unittest.TestCase):
             catalog = json.loads((ROOT / "catalog.source.json").read_text())
             catalog["plugins"][0]["status"] = "submitted"
             (root / "catalog.source.json").write_text(json.dumps(catalog))
-            self.assertEqual(len(PACK.reviewed_packages(root)), 2)
+            self.assertEqual(len(PACK.reviewed_packages(root)), 4)
             (root / "packages" / "text-tools" / "main.js").write_text("return {text: 'changed'};")
             with self.assertRaises(ValueError):
                 PACK.reviewed_packages(root)

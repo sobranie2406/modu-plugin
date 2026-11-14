@@ -8,6 +8,8 @@
 | --- | --- | --- | --- |
 | 私密书籍 | 打开私密书籍、锁定私密书籍 | 脚本执行、私密书籍管理 | 1.3.10+ |
 | 文字整理 | 整理所选文字的空格和换行 | 脚本执行、划词动作 | 1.3.10+ |
+| 查词预处理 | 原词未命中时尝试英语词形、法语前缀和正则规则 | 脚本执行、查词变体 | 1.3.10+ |
+| 网页稍后阅读 | 提取网页正文，导出 Markdown 或加入书架 | 脚本执行、指定网页采集 | 1.3.10+ |
 | 示例提示词包 | 两个提示词模板与一个划词动作 | AI 提示词、划词动作 | 1.3.1+ |
 
 插件不随默读安装。下载 `.moduplugin` 后，在「设置 → 实验性功能 → 管理插件」中安装并启用。
@@ -27,10 +29,17 @@
 
 - [私密书籍 1.0.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.private-books-1.0.0.moduplugin)
 - [文字整理 1.0.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.text-tools-1.0.0.moduplugin)
+- [查词预处理 1.0.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.dictionary-transform-1.0.0.moduplugin)
+- [网页稍后阅读 1.0.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.web-clipper-1.0.0.moduplugin)
 - [示例提示词包 1.1.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.example.prompt-pack-1.1.0.moduplugin)
 - [SHA-256 校验](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/SHA256SUMS)
 
 GitHub 访问不畅时，可从 [Gitee 文件目录](https://gitee.com/sobranie2406/modu-plugin/tree/main/dist) 下载同名插件包；[签名清单镜像](https://gitee.com/sobranie2406/modu-plugin/raw/main/catalog.json) 与 GitHub 保持一致。
+
+## 使用
+
+- **查词预处理**：启用后自动参与查词，保留原词命中的结果；在插件设置中调整英语、法语和自定义正则规则。参见[规则示例](packages/dictionary-transform/README.md)。感谢 [@zhuhui-in](https://github.com/zhuhui-in) 提出的 [#83](https://github.com/sobranie2406/modureader/issues/83)。
+- **网页稍后阅读**：打开插件详情中的同名动作，输入网址，获取正文后预览，再导出 Markdown 或加入书架。图片保留为链接。
 
 ## 打包
 
@@ -59,6 +68,8 @@ python3 scripts/sign_catalog.py --private-key /protected/path/catalog-key.pem
 - `input.context`：仅在动作声明 `scope: "context"` 时提供上下文。
 - `input.settings`：本插件声明的普通设置，不含密钥。
 - `input.book`：授权的书籍信息，不含文件路径。
+
+`surface: "dictionary"` 的动作只接收查词文字与插件设置，返回 `{candidates: [...]}`，不调用宿主接口。`article:capture` 提供 `modu.articles.capture()`，打开由用户输入网址的采集页面。
 
 宿主只开放已声明并经用户授权的接口。插件不直接访问文件、数据库、账号密钥或阅读器页面。
 
