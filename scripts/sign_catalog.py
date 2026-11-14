@@ -14,6 +14,7 @@ from pack import reviewed_packages
 
 
 ROOT = Path(__file__).resolve().parents[1]
+REPOSITORY = "https://github.com/sobranie2406/modu-plugin"
 KEY_ID = "modu-plugins-2026-01"
 PUBLIC_KEY_BASE64 = "t8p8Y8jV/yr7BDJCUeqpSdrRmRDec/spYO8V8FktTWM="
 SPKI_PREFIX = bytes.fromhex("302a300506032b6570032100")
@@ -40,7 +41,8 @@ def reviewed_payload(root: Path) -> bytes:
         raise ValueError("Catalog source exceeds the payload limit")
     catalog = json.loads(payload.decode("utf-8"), object_pairs_hook=_unique_object)
     if (not isinstance(catalog, dict) or type(catalog.get("schemaVersion")) is not int or
-            catalog["schemaVersion"] != 1 or not isinstance(catalog.get("plugins"), list)):
+            catalog["schemaVersion"] != 1 or catalog.get("repository") != REPOSITORY or
+            not isinstance(catalog.get("plugins"), list)):
         raise ValueError("Unsupported catalog source")
     for entry in catalog["plugins"]:
         if not isinstance(entry, dict) or entry.get("status") != "reviewed":

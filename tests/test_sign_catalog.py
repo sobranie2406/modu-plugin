@@ -97,6 +97,12 @@ class CatalogSignatureTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.sign()
 
+    def test_catalog_repository_identity_must_match_modu_plugin(self):
+        self.change_catalog(lambda value: value.update(repository="https://example.com/unreviewed"))
+        with self.assertRaises(ValueError):
+            self.sign()
+        self.assertFalse((self.root / "catalog.json").exists())
+
     def test_duplicate_source_fields_are_rejected(self):
         (self.root / "catalog.source.json").write_text('{"schemaVersion":1,"schemaVersion":1,"plugins":[]}')
         with self.assertRaises(ValueError):

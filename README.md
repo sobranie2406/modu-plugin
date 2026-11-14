@@ -2,6 +2,8 @@
 
 供默读安装的独立插件包。
 
+[GitHub](https://github.com/sobranie2406/modu-plugin) · [Gitee 镜像](https://gitee.com/sobranie2406/modu-plugin)
+
 | 插件 | 用途 | 权限 | 默读版本 |
 | --- | --- | --- | --- |
 | 私密书籍 | 打开私密书籍、锁定私密书籍 | 脚本执行、私密书籍管理 | 1.3.10+ |
@@ -23,10 +25,12 @@
 
 ## 下载
 
-- [私密书籍 1.0.0](https://raw.githubusercontent.com/sobranie2406/plug-in/main/dist/com.modu.private-books-1.0.0.moduplugin)
-- [文字整理 1.0.0](https://raw.githubusercontent.com/sobranie2406/plug-in/main/dist/com.modu.text-tools-1.0.0.moduplugin)
-- [示例提示词包 1.1.0](https://raw.githubusercontent.com/sobranie2406/plug-in/main/dist/com.example.prompt-pack-1.1.0.moduplugin)
-- [SHA-256 校验](https://raw.githubusercontent.com/sobranie2406/plug-in/main/dist/SHA256SUMS)
+- [私密书籍 1.0.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.private-books-1.0.0.moduplugin)
+- [文字整理 1.0.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.text-tools-1.0.0.moduplugin)
+- [示例提示词包 1.1.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.example.prompt-pack-1.1.0.moduplugin)
+- [SHA-256 校验](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/SHA256SUMS)
+
+GitHub 访问不畅时，可从 [Gitee 文件目录](https://gitee.com/sobranie2406/modu-plugin/tree/main/dist) 下载同名插件包；[签名清单镜像](https://gitee.com/sobranie2406/modu-plugin/raw/main/catalog.json) 与 GitHub 保持一致。
 
 ## 打包
 

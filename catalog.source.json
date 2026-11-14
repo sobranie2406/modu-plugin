@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "repository": "https://github.com/sobranie2406/plug-in",
+  "repository": "https://github.com/sobranie2406/modu-plugin",
   "plugins": [
     {
       "id": "com.modu.private-books",
