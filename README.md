@@ -11,7 +11,7 @@
 | 私密书籍 | 隐藏书籍、管理与锁定私密书籍 | 脚本执行、私密书籍管理、书籍菜单 | 1.3.10+ |
 | 文字整理 | 整理所选文字的空格和换行 | 脚本执行、划词动作 | 1.3.10+ |
 | 查词预处理 | 原词未命中时尝试英语词形、法语前缀和正则规则 | 脚本执行、查词变体 | 1.3.10+ |
-| 网页稍后阅读 | 提取网页正文，导出 Markdown 或加入书架 | 脚本执行、指定网页采集 | 1.3.10+ |
+| 网页稍后阅读 | 识别网页正文和元数据，导出 Markdown 或加入书架 | 脚本执行、指定网页采集、离线正文提取 | 1.3.10+ |
 | 示例提示词包 | 两个提示词模板与一个划词动作 | AI 提示词、划词动作 | 1.3.1+ |
 
 插件不随默读安装。在「设置 → 插件」打开「启用插件」，再下载安装，或导入下载好的 `.moduplugin`。
@@ -32,7 +32,7 @@
 - [私密书籍 1.1.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.private-books-1.1.0.moduplugin)
 - [文字整理 1.0.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.text-tools-1.0.0.moduplugin)
 - [查词预处理 1.0.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.dictionary-transform-1.0.0.moduplugin)
-- [网页稍后阅读 1.0.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.web-clipper-1.0.0.moduplugin)
+- [网页稍后阅读 1.1.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.web-clipper-1.1.0.moduplugin)
 - [示例提示词包 1.1.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.example.prompt-pack-1.1.0.moduplugin)
 - [SHA-256 校验](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/SHA256SUMS)
 
@@ -42,16 +42,26 @@ GitHub 访问不畅时，可从 [Gitee 文件目录](https://gitee.com/sobranie2
 
 - **私密书籍**：启用后，长按书籍选择「隐藏」；在私密书籍中查看或移出书籍。安装页提示更新时，请先更新默读。
 - **查词预处理**：启用后自动参与查词，保留原词命中的结果；在插件设置中调整英语、法语和自定义正则规则。参见[规则示例](packages/dictionary-transform/README.md)。感谢 [@zhuhui-in](https://github.com/zhuhui-in) 提出的 [#83](https://github.com/sobranie2406/modureader/issues/83)。
-- **网页稍后阅读**：打开插件详情中的同名动作，输入网址，获取正文后预览，再导出 Markdown 或加入书架。图片保留为链接。
+- **网页稍后阅读**：打开插件详情中的同名动作，输入网址，获取正文后预览，再导出 Markdown 或加入书架。插件设置可选择保留作者、日期和图片链接；正文算法随插件独立更新。1.1.0 需要支持 `article:extract` 的默读版本。
 
 ## 打包
 
-需要 Python 3，无需额外依赖：
+使用 Python 3 打包已审核源码：
 
 ```sh
 python3 scripts/pack.py
 python3 -m unittest discover -s tests
 ```
+
+网页稍后阅读的离线提取器使用锁定的构建依赖，Node.js 18+ 可重建：
+
+```sh
+npm ci --ignore-scripts
+npm run build:web-clipper
+node --test tests/test_*.mjs
+```
+
+依赖仅用于插件构建，产物为包内的 `extract.js`，运行时不加载远程代码。原始模块位于 `src/web-clipper/`；构建针对 Chrome 83 语法，并将 LinkeDOM 两处 `Array.at(0)` 改为等价索引访问。
 
 审核后更新 `catalog.source.json` 的版本和校验值，再签名发布：
 
@@ -73,6 +83,8 @@ python3 scripts/sign_catalog.py --private-key /protected/path/catalog-key.pem
 - `input.book`：授权的书籍信息，不含文件路径。
 
 `surface: "dictionary"` 的动作只接收查词文字与插件设置，返回 `{candidates: [...]}`，不调用宿主接口。`article:capture` 提供 `modu.articles.capture()`，打开由用户输入网址的采集页面。
+
+`article:extract` 声明 `surface: "article"` 的离线动作，接收 `{html, url, plainText, settings, actionId}`，返回 `{title, markdown}`。正文识别、清理和转换都在插件内运行，不能调用宿主接口；宿主负责受控下载、预览和保存。
 
 `bookAction` 是书籍长按菜单中的声明式动作，不执行 JavaScript。`privateLibrary.hide` 由默读处理，需要 `ui:book-action` 和 `library:private` 权限。
 

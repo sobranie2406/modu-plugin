@@ -1,0 +1,14 @@
+{
+  "name": "modu-plugin-build-tools",
+  "private": true,
+  "scripts": {
+    "build:web-clipper": "node scripts/build_web_clipper.mjs",
+    "test:web-clipper": "node --test tests/test_web_clipper.mjs tests/test_web_clipper_extract.mjs"
+  },
+  "devDependencies": {
+    "@mozilla/readability": "0.6.0",
+    "esbuild": "0.28.2",
+    "linkedom": "0.18.12",
+    "turndown": "7.2.5"
+  }
+}

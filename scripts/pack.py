@@ -14,6 +14,15 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def package_bytes(source: Path) -> tuple[str, bytes]:
     manifest = json.loads((source / "manifest.json").read_text(encoding="utf-8"))
+    settings = manifest.get("settings", [])
+    if not isinstance(settings, list):
+        raise ValueError("Settings must be a list")
+    setting_keys = set()
+    for setting in settings:
+        key = setting.get("key") if isinstance(setting, dict) else None
+        if (not isinstance(key, str) or not re.fullmatch(r"[a-z][a-z0-9_]{0,39}", key) or key in setting_keys):
+            raise ValueError("Invalid or duplicate setting key")
+        setting_keys.add(key)
     files = []
     for path in sorted(source.rglob("*")):
         if path.is_symlink():
@@ -22,10 +31,21 @@ def package_bytes(source: Path) -> tuple[str, bytes]:
             files.append((path.relative_to(source).as_posix(), path.read_bytes()))
     file_map = dict(files)
     book_action_ids = set()
+    article_actions = 0
     for action in manifest["contributes"]:
         if action["kind"] == "scriptAction":
+            article = action.get("surface") == "article"
+            if article:
+                article_actions += 1
+                capabilities = manifest.get("capabilities")
+                if (article_actions > 1 or type(action.get("schema")) is not int or action["schema"] != 1 or
+                        action.get("scope") != "selection" or not isinstance(capabilities, list) or
+                        any(not isinstance(capability, str) for capability in capabilities) or
+                        "article:extract" not in capabilities):
+                    raise ValueError("Article extraction requires one scoped action and its capability")
             entry = action["entry"]
-            if entry not in file_map or len(file_map[entry]) > 128 * 1024:
+            limit = (512 if article else 128) * 1024
+            if entry not in file_map or len(file_map[entry]) > limit:
                 raise ValueError("Missing or oversized JavaScript entry")
         elif action["kind"] == "bookAction":
             if (set(action) != {"kind", "schema", "id", "name", "command"} or

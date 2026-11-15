@@ -47,12 +47,14 @@ class PackageTest(unittest.TestCase):
             "com.modu.private-books-1.1.0.moduplugin": "667b1b04aa0629c3344163656dd9398ba59c55fd0bb70e26d235a4eefcaacb68",
             "com.modu.text-tools-1.0.0.moduplugin": "19ec63c7ab15d2b9895ee48c5c46e1493247197e8d3cea29746d34beece0717e",
             "com.modu.dictionary-transform-1.0.0.moduplugin": "5e57cf9c2e6e988447bc0a7b7d2d446b41496a11eec98575dc7d3327747d8a7e",
-            "com.modu.web-clipper-1.0.0.moduplugin": "4cf337b9f425b58bfc375fa43b64f86c5b2298d316a00e371e0866bb69e300f9",
+            "com.modu.web-clipper-1.1.0.moduplugin": "a06f1a3424efddb62bdc12a5a7b2b85b0f216ddf6156609a96673b394e01abad",
         }
         for name, digest in expected.items():
             self.assertEqual(hashlib.sha256(packages[name]).hexdigest(), digest)
         self.assertEqual(hashlib.sha256((ROOT / "dist" / "com.modu.private-books-1.0.0.moduplugin").read_bytes()).hexdigest(),
                          "ce459c352a302b3dc1b7e5b3fade872c5dec3ef53a533747674bb4b038b0eba4")
+        self.assertEqual(hashlib.sha256((ROOT / "dist" / "com.modu.web-clipper-1.0.0.moduplugin").read_bytes()).hexdigest(),
+                         "4cf337b9f425b58bfc375fa43b64f86c5b2298d316a00e371e0866bb69e300f9")
         with zipfile.ZipFile(io.BytesIO(packages["com.example.prompt-pack-1.1.0.moduplugin"])) as archive:
             original = {
                 "manifest.json": "405941bfa8f15fef6a5fa7b6d6628da357733f84faa919c6676699bdcc730fbe",
@@ -74,6 +76,53 @@ class PackageTest(unittest.TestCase):
             self.assertEqual([action for action in manifest["contributes"] if action["kind"] == "bookAction"], [{
                 "kind": "bookAction", "schema": 1, "id": "hide", "name": {"zh-CN": "隐藏", "en": "Hide"}, "command": "privateLibrary.hide"
             }])
+
+    def test_web_clipper_keeps_its_small_launcher_and_bundles_scoped_offline_extraction(self):
+        name, data = PACK.package_bytes(ROOT / "packages" / "web-clipper")
+        self.assertEqual(name, "com.modu.web-clipper-1.1.0.moduplugin")
+        with zipfile.ZipFile(io.BytesIO(data)) as archive:
+            self.assertEqual(set(archive.namelist()), {"LICENSE", "README.md", "THIRD_PARTY_NOTICES.md", "main.js", "extract.js", "manifest.json"})
+            manifest = json.loads(archive.read("manifest.json"))
+            self.assertEqual(set(manifest["capabilities"]), {"script:run", "article:capture", "article:extract"})
+            self.assertEqual([(action["id"], action["entry"], action["surface"]) for action in manifest["contributes"]],
+                             [("capture", "main.js", "library"), ("extract", "extract.js", "article")])
+            self.assertEqual(manifest["contributes"][1]["scope"], "selection")
+            self.assertEqual([(setting["key"], setting["type"], setting["defaultValue"]) for setting in manifest["settings"]],
+                             [("include_metadata", "toggle", True), ("include_images", "toggle", True)])
+            self.assertEqual(hashlib.sha256(archive.read("main.js")).hexdigest(), "8a0f90e13534bb2c27b8bcae4a68b9598661a657ee759fef2bf717342fe33d34")
+            self.assertGreater(len(archive.read("extract.js")), 128 * 1024)
+            self.assertLessEqual(len(archive.read("extract.js")), 512 * 1024)
+            notices = archive.read("THIRD_PARTY_NOTICES.md").decode()
+            for text in ("Apache License", "ISC License", "MIT License", "Readability", "LinkeDOM", "Turndown", "Luc Thevenard"):
+                self.assertIn(text, notices)
+
+    def test_article_entry_needs_its_capability_scope_and_separate_size_limit(self):
+        for change in ("capability", "scope", "duplicate", "schema", "oversized_article", "oversized_launcher"):
+            with self.subTest(change=change), tempfile.TemporaryDirectory() as directory:
+                source = Path(directory) / "web-clipper"
+                shutil.copytree(ROOT / "packages" / "web-clipper", source)
+                path = source / "manifest.json"
+                manifest = json.loads(path.read_bytes())
+                if change == "capability": manifest["capabilities"].remove("article:extract")
+                if change == "scope": manifest["contributes"][1]["scope"] = "context"
+                if change == "duplicate": manifest["contributes"].append(manifest["contributes"][1])
+                if change == "schema": manifest["contributes"][1]["schema"] = True
+                if change == "oversized_article": (source / "extract.js").write_bytes(b" " * (512 * 1024 + 1))
+                if change == "oversized_launcher": (source / "main.js").write_bytes(b" " * (128 * 1024 + 1))
+                path.write_text(json.dumps(manifest))
+                with self.assertRaises(ValueError): PACK.package_bytes(source)
+
+    def test_setting_keys_match_host_format_and_are_unique(self):
+        for key in ("includeMetadata", "_bad", "7bad", "bad-key", "a" * 41, 1, None, "include_images"):
+            with self.subTest(key=key), tempfile.TemporaryDirectory() as directory:
+                source = Path(directory) / "web-clipper"
+                shutil.copytree(ROOT / "packages" / "web-clipper", source)
+                path = source / "manifest.json"
+                manifest = json.loads(path.read_bytes())
+                manifest["settings"][0]["key"] = key
+                path.write_text(json.dumps(manifest))
+                with self.assertRaisesRegex(ValueError, "setting key"):
+                    PACK.package_bytes(source)
 
     def test_book_action_rejects_executable_fields_unknown_commands_and_missing_grants(self):
         changes = [

@@ -1,2 +1,6 @@
 * text=auto eol=lf
 *.moduplugin binary
+
+# Generated dependencies and upstream licenses retain their original bytes.
+packages/web-clipper/extract.js -whitespace linguist-generated=true
+packages/web-clipper/THIRD_PARTY_NOTICES.md -whitespace

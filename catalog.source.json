@@ -172,7 +172,7 @@
     },
     {
       "id": "com.modu.web-clipper",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "name": {
         "zh-CN": "网页稍后阅读",
         "en": "Web clipper"
@@ -185,30 +185,37 @@
       "hostApi": 1,
       "capabilities": [
         "script:run",
-        "article:capture"
+        "article:capture",
+        "article:extract"
       ],
       "status": "reviewed",
       "sourcePath": "packages/web-clipper",
       "package": {
-        "path": "dist/com.modu.web-clipper-1.0.0.moduplugin",
-        "sha256": "4cf337b9f425b58bfc375fa43b64f86c5b2298d316a00e371e0866bb69e300f9"
+        "path": "dist/com.modu.web-clipper-1.1.0.moduplugin",
+        "sha256": "a06f1a3424efddb62bdc12a5a7b2b85b0f216ddf6156609a96673b394e01abad"
       },
       "files": {
         "LICENSE": "776fdcb645b929da3ec5184f16f9ef1d50ac2094394a1958cb7fd4d1d9a609a1",
-        "README.md": "4d5962a31c8f853c932a27c11f9a77a137a3986759fde8415eed6014f9b17a96",
+        "README.md": "58cc915418e30c657df16f60fbe8c08afb2d4a50d319411685332c47da52e1a4",
+        "THIRD_PARTY_NOTICES.md": "6bcf62cb523046c530a34ac40515d636bb05d631bc186e00db359a52806c7642",
+        "extract.js": "da23162552aeb17c9292d3b8970b0a02528f249ab63561cb5f0cb19220096b1b",
         "main.js": "8a0f90e13534bb2c27b8bcae4a68b9598661a657ee759fef2bf717342fe33d34",
-        "manifest.json": "fa65a6d762c1f3417b2bed223654af3dfc5c400e7848e57cf334751e0f0cb4db"
+        "manifest.json": "b3a61e41aa5821765cb774c2ce05c45f51b613933518607f7141e23f47615dfc"
       },
       "review": {
         "kind": "agent-technical",
         "reviewer": "Codex",
-        "reviewedAt": "2026-11-14T14:51:45.523391Z",
+        "reviewedAt": "2026-11-15T08:00:03.828977Z",
         "checks": [
-          "manifest and capability review",
-          "24 extraction, network and UI regression tests",
-          "2 script dispatch tests",
-          "anonymous HTTPS, public DNS pinning, redirect and cancellation review",
-          "complete package inventory and SHA-256 verification"
+          "manifest and capability review: small library launcher plus isolated article extraction",
+          "42 script tests, including 20 web-clipper tests and all six migrated native extraction regression groups",
+          "21 deterministic packaging, host-compatible unique snake-case setting keys, scoped article limits and signing-guard tests",
+          "clean offline locked dependency install reproduces identical Chrome 83-targeted bundle bytes",
+          "six real Chrome 157 CSP Worker smoke cases before setting-key correction; corrected snake-case settings-off case separately verified on final bundle",
+          "anonymous public-article offline smoke: title, body, source preserved with no image fetching or host calls",
+          "pinned Readability, virtual DOM and Markdown dependencies with third-party license notices",
+          "complete package file inventory and SHA-256 verification; all six prior package artifacts unchanged",
+          "native setting key convention mirrored in pack validation; legacy artifacts preserved"
         ]
       }
     }
