@@ -14,6 +14,7 @@ test('private library dispatches only declared open and lock actions', async () 
   }};
   assert.equal((await run({ actionId: 'open' }, modu)).text, '');
   assert.match((await run({ actionId: 'lock' }, modu)).text, /锁定/);
+  await assert.rejects(run({ actionId: 'hide' }, modu));
   await assert.rejects(run({ actionId: 'unknown' }, modu));
   assert.deepEqual(calls, ['open', 'lock']);
 });

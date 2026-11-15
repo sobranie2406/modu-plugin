@@ -2,19 +2,21 @@
 
 供默读安装的独立插件包。
 
+开发、设置入口与本机调试方式见[插件开发规范](DEVELOPMENT.md)。
+
 [GitHub](https://github.com/sobranie2406/modu-plugin) · [Gitee 镜像](https://gitee.com/sobranie2406/modu-plugin)
 
 | 插件 | 用途 | 权限 | 默读版本 |
 | --- | --- | --- | --- |
-| 私密书籍 | 打开私密书籍、锁定私密书籍 | 脚本执行、私密书籍管理 | 1.3.10+ |
+| 私密书籍 | 隐藏书籍、管理与锁定私密书籍 | 脚本执行、私密书籍管理、书籍菜单 | 1.3.10+ |
 | 文字整理 | 整理所选文字的空格和换行 | 脚本执行、划词动作 | 1.3.10+ |
 | 查词预处理 | 原词未命中时尝试英语词形、法语前缀和正则规则 | 脚本执行、查词变体 | 1.3.10+ |
 | 网页稍后阅读 | 提取网页正文，导出 Markdown 或加入书架 | 脚本执行、指定网页采集 | 1.3.10+ |
 | 示例提示词包 | 两个提示词模板与一个划词动作 | AI 提示词、划词动作 | 1.3.1+ |
 
-插件不随默读安装。下载 `.moduplugin` 后，在「设置 → 实验性功能 → 管理插件」中安装并启用。
+插件不随默读安装。在「设置 → 插件」打开「启用插件」，再下载安装，或导入下载好的 `.moduplugin`。
 插件页面会自动加载已审核目录，提供下载安装、权限预览和确认。
-默读仅接受经过项目审核、文件校验一致的插件版本。启用后才显示插件入口，停用后移除入口。
+普通安装只接受经过项目审核、文件校验一致的插件版本。启用后才显示插件入口，停用后移除入口。本机开发调试使用独立的临时会话，参见[开发说明](DEVELOPMENT.md#实机调试)。
 
 ## 审核与上架
 
@@ -27,7 +29,7 @@
 
 ## 下载
 
-- [私密书籍 1.0.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.private-books-1.0.0.moduplugin)
+- [私密书籍 1.1.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.private-books-1.1.0.moduplugin)
 - [文字整理 1.0.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.text-tools-1.0.0.moduplugin)
 - [查词预处理 1.0.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.dictionary-transform-1.0.0.moduplugin)
 - [网页稍后阅读 1.0.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.web-clipper-1.0.0.moduplugin)
@@ -38,6 +40,7 @@ GitHub 访问不畅时，可从 [Gitee 文件目录](https://gitee.com/sobranie2
 
 ## 使用
 
+- **私密书籍**：启用后，长按书籍选择「隐藏」；在私密书籍中查看或移出书籍。安装页提示更新时，请先更新默读。
 - **查词预处理**：启用后自动参与查词，保留原词命中的结果；在插件设置中调整英语、法语和自定义正则规则。参见[规则示例](packages/dictionary-transform/README.md)。感谢 [@zhuhui-in](https://github.com/zhuhui-in) 提出的 [#83](https://github.com/sobranie2406/modureader/issues/83)。
 - **网页稍后阅读**：打开插件详情中的同名动作，输入网址，获取正文后预览，再导出 Markdown 或加入书架。图片保留为链接。
 
@@ -70,6 +73,8 @@ python3 scripts/sign_catalog.py --private-key /protected/path/catalog-key.pem
 - `input.book`：授权的书籍信息，不含文件路径。
 
 `surface: "dictionary"` 的动作只接收查词文字与插件设置，返回 `{candidates: [...]}`，不调用宿主接口。`article:capture` 提供 `modu.articles.capture()`，打开由用户输入网址的采集页面。
+
+`bookAction` 是书籍长按菜单中的声明式动作，不执行 JavaScript。`privateLibrary.hide` 由默读处理，需要 `ui:book-action` 和 `library:private` 权限。
 
 宿主只开放已声明并经用户授权的接口。插件不直接访问文件、数据库、账号密钥或阅读器页面。
 

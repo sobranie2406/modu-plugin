@@ -5,6 +5,7 @@ import hashlib
 import io
 import json
 from pathlib import Path
+import re
 import zipfile
 
 
@@ -20,11 +21,30 @@ def package_bytes(source: Path) -> tuple[str, bytes]:
         if path.is_file():
             files.append((path.relative_to(source).as_posix(), path.read_bytes()))
     file_map = dict(files)
+    book_action_ids = set()
     for action in manifest["contributes"]:
         if action["kind"] == "scriptAction":
             entry = action["entry"]
             if entry not in file_map or len(file_map[entry]) > 128 * 1024:
                 raise ValueError("Missing or oversized JavaScript entry")
+        elif action["kind"] == "bookAction":
+            if (set(action) != {"kind", "schema", "id", "name", "command"} or
+                    type(action.get("schema")) is not int or action["schema"] != 1 or
+                    action.get("command") != "privateLibrary.hide"):
+                raise ValueError("Unsupported declarative book action")
+            identity = action.get("id")
+            if (not isinstance(identity, str) or not re.fullmatch(r"[a-z0-9][a-z0-9._-]{0,62}", identity)
+                    or identity in book_action_ids):
+                raise ValueError("Invalid or duplicate book action id")
+            book_action_ids.add(identity)
+            name = action["name"]
+            labels = [name] if isinstance(name, str) else list(name.values()) if isinstance(name, dict) else []
+            if (not labels or any(not isinstance(label, str) or not label.strip() or len(label) > 40 for label in labels)):
+                raise ValueError("Invalid book action label")
+            capabilities = manifest.get("capabilities")
+            if (not isinstance(capabilities, list) or any(not isinstance(capability, str) for capability in capabilities)
+                    or not {"ui:book-action", "library:private"}.issubset(capabilities)):
+                raise ValueError("Book action requires explicit menu and private-library capabilities")
     if "LICENSE" not in file_map:
         # Preserve a package's original license bytes when it supplies one.
         files.append(("LICENSE", (ROOT / "LICENSE").read_bytes()))
