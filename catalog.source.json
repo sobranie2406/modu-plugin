@@ -4,52 +4,55 @@
   "plugins": [
     {
       "id": "com.modu.private-books",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "name": {
         "zh-CN": "私密书籍",
         "en": "Private books"
       },
       "description": {
-        "zh-CN": "隐藏书籍，管理与锁定私密书籍。",
-        "en": "Hide books, manage private books and lock the private library."
+        "zh-CN": "管理私密书籍，设置显示范围、导入和隐藏规则。",
+        "en": "Manage private books and configure visibility, import and hide policies."
       },
       "minAppVersion": "1.3.10",
       "hostApi": 1,
       "capabilities": [
         "script:run",
         "library:private",
-        "ui:book-action"
+        "ui:book-action",
+        "library:private-control",
+        "library:private-policy",
+        "settings:device"
       ],
       "status": "reviewed",
       "sourcePath": "packages/private-books",
       "package": {
-        "path": "dist/com.modu.private-books-1.1.0.moduplugin",
-        "sha256": "667b1b04aa0629c3344163656dd9398ba59c55fd0bb70e26d235a4eefcaacb68"
+        "path": "dist/com.modu.private-books-1.2.0.moduplugin",
+        "sha256": "f8641697e37e59628630ed63d90b89940527712cd0a09d09a73dda95895ea020"
       },
       "files": {
         "LICENSE": "776fdcb645b929da3ec5184f16f9ef1d50ac2094394a1958cb7fd4d1d9a609a1",
-        "README.md": "e27917fed08dcedb31121d3969ba02a3a714cc4adcd7e78a027fad07cd584b9e",
-        "main.js": "bc2994699ee7a5efcf98ef0f9b5bf93470389225e91b39538b452576c4a07229",
-        "manifest.json": "962295fc6522328a2037dd02a66f08b8c15baeeb923a0b03878decaa9f9efb06"
+        "README.md": "603748347f2038a89e0fdf4adca63cde8c77d42fecade35a32645f80776cf8df",
+        "import.js": "8a167ad1e362445533143f4366ac8526caa23fb18914e7ead0033cb15b670162",
+        "main.js": "b526a3dc454b4cfbfdb768f6e0535a4edba2342ebe111a85561f9999c16034a3",
+        "manifest.json": "879909b09b4999e6dcb5773a2bdd70402cbf11b7ee37066d0344af1aa6524393"
       },
       "review": {
         "kind": "agent-technical",
         "reviewer": "Codex",
-        "reviewedAt": "2026-11-15T02:12:41.914189Z",
+        "reviewedAt": "2026-11-15T08:47:23.123448Z",
         "checks": [
-          "manifest and declarative hide-command capability review",
-          "40 host bookAction and 6 hide-action regression tests",
-          "private-local transport and portable-backup filtering regression tests",
-          "18 deterministic packaging, bookAction validation and signing-guard tests",
-          "24 script tests; open/lock unchanged and hide not executable via JavaScript",
-          "updated package file inventory and SHA-256 verification",
-          "private-books 1.0.0 artifact SHA-256 preserved"
+          "manifest device bindings and generic book-action capability review",
+          "seven private-book script regressions: authorized picker, cancellation, locking option and pure import policy",
+          "open and lock script compatibility retained; no PIN, file or database access in package",
+          "private import policy gate defaults off; device preferences do not declare synced storage",
+          "51 Node script tests and 28 packaging, private-policy, historical-artifact and signing-guard tests pass",
+          "complete deterministic package file inventory and SHA-256 verification; all seven published artifacts unchanged"
         ]
       }
     },
     {
       "id": "com.modu.text-tools",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "name": {
         "zh-CN": "文字整理",
         "en": "Text cleanup"
@@ -67,39 +70,40 @@
       "status": "reviewed",
       "sourcePath": "packages/text-tools",
       "package": {
-        "path": "dist/com.modu.text-tools-1.0.0.moduplugin",
-        "sha256": "19ec63c7ab15d2b9895ee48c5c46e1493247197e8d3cea29746d34beece0717e"
+        "path": "dist/com.modu.text-tools-1.0.1.moduplugin",
+        "sha256": "c2f219cb7cdd7010987b545ba470462caa5a3295550bfd8d9f514381e5392b89"
       },
       "files": {
         "LICENSE": "776fdcb645b929da3ec5184f16f9ef1d50ac2094394a1958cb7fd4d1d9a609a1",
-        "README.md": "edd90e37d85843ace496f33a4b013fe1539b1127fb5b3c0e02872a6cb420df46",
+        "README.md": "1df4da539e61cb4c097165fc22bf97700c68d8c596d10f20f993350ffe11d98c",
         "main.js": "f8791bb3a554af7e767f430771eadd15f5540afe0b9c1505edf357fb3e5a283a",
-        "manifest.json": "33d36075899c350a7f4352867bd3ec3b51b448804d7b1104f6df353bdf64dc71"
+        "manifest.json": "c82c71750f326ddd74a458250a34a627f037c3eedddb4b5c542eae0791eb1842"
       },
       "review": {
         "kind": "agent-technical",
         "reviewer": "Codex",
-        "reviewedAt": "2026-11-14T13:27:25Z",
+        "reviewedAt": "2026-11-15T08:47:23.124225Z",
         "checks": [
-          "manifest and selection-only scope review",
-          "text transformation and settings tests",
+          "selection-only script and settings regressions pass",
+          "main.js byte-for-byte unchanged; guidance and version updated",
           "no network or library access",
-          "package file inventory and SHA-256 verification"
+          "51 Node script tests and 28 packaging, private-policy, historical-artifact and signing-guard tests pass",
+          "complete deterministic package file inventory and SHA-256 verification; all seven published artifacts unchanged"
         ]
       }
     },
     {
       "id": "com.example.prompt-pack",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "name": {
         "zh-CN": "示例提示词包",
         "en": "Example prompt pack"
       },
       "description": {
-        "zh-CN": "两个提示词模板与一个划词动作。",
-        "en": "Two prompt templates and one selection action."
+        "zh-CN": "摘要、追问与划词解释，可设置语气、字数和原文引用。",
+        "en": "Summaries, follow-up questions and selection explanations with configurable tone, length and quotations."
       },
-      "minAppVersion": "1.3.1",
+      "minAppVersion": "1.3.10",
       "hostApi": 1,
       "capabilities": [
         "ai:prompt-pack",
@@ -108,29 +112,31 @@
       "status": "reviewed",
       "sourcePath": "packages/prompt-pack",
       "package": {
-        "path": "dist/com.example.prompt-pack-1.1.0.moduplugin",
-        "sha256": "d49736985b07b8e60c60982935a00dfbf7fe6708f35e2549dc593bba1e2ab45b"
+        "path": "dist/com.example.prompt-pack-1.1.1.moduplugin",
+        "sha256": "c348f9a53da986b93001c934857d55a2547656ed18bdb0d95b81a1f20464d4b1"
       },
       "files": {
         "LICENSE": "1b8f0b15266cbeba35ed28401ffbf7e9e4438e302e1431462342b8d0ed3d6a63",
-        "README.md": "dc7a53ee926b20a087fb1240db0051af274a7aa46650223e1ef2db54335fb729",
-        "manifest.json": "405941bfa8f15fef6a5fa7b6d6628da357733f84faa919c6676699bdcc730fbe"
+        "README.md": "e2c2e0dda1828a7afe91d54727aa210653a9740cf9a34511022cb9e949de35c7",
+        "manifest.json": "d0e78cfe2398787a7870ec6b649c6c0147d2db1c14793893e49806f931e0c1f3"
       },
       "review": {
         "kind": "agent-technical",
         "reviewer": "Codex",
-        "reviewedAt": "2026-11-14T13:27:25Z",
+        "reviewedAt": "2026-11-15T08:47:23.124964Z",
         "checks": [
-          "declarative prompt and selection action review",
-          "no executable files",
-          "byte-for-byte import from existing app-approved prompt pack",
-          "original CC0 license and all approved file SHA-256 fingerprints preserved"
+          "three prompt contributions reference actual tone, quote_original and max_words settings",
+          "prompt setting defaults and contribution identities verified; no executable files",
+          "minimum application version aligned to tested generic setting-placeholder capability",
+          "original CC0 license bytes preserved",
+          "51 Node script tests and 28 packaging, private-policy, historical-artifact and signing-guard tests pass",
+          "complete deterministic package file inventory and SHA-256 verification; all seven published artifacts unchanged"
         ]
       }
     },
     {
       "id": "com.modu.dictionary-transform",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "name": {
         "zh-CN": "查词预处理",
         "en": "Dictionary word forms"
@@ -148,31 +154,31 @@
       "status": "reviewed",
       "sourcePath": "packages/dictionary-transform",
       "package": {
-        "path": "dist/com.modu.dictionary-transform-1.0.0.moduplugin",
-        "sha256": "5e57cf9c2e6e988447bc0a7b7d2d446b41496a11eec98575dc7d3327747d8a7e"
+        "path": "dist/com.modu.dictionary-transform-1.0.1.moduplugin",
+        "sha256": "7a7831be13966e0cb21604facfcc44266410de003595276776413176b03dce16"
       },
       "files": {
         "LICENSE": "776fdcb645b929da3ec5184f16f9ef1d50ac2094394a1958cb7fd4d1d9a609a1",
-        "README.md": "64ba2340065634fbf0e8afb34f5231b8823623ca10c0c3b1b8e29b5dfa291080",
+        "README.md": "39bb9c73784672fed6a173b17a5b7fdce51ace0f1d4119abdcfde8da03ebbd43",
         "main.js": "2749b29caa481af65d21f85af0bf71f6e55b1725d55debeb6020c6fb6df97b7a",
-        "manifest.json": "05ef35d2f1e8fedb80f7fa5e5d890b34c39dc0efac8a5c22ab53357a99e0e759"
+        "manifest.json": "fdaeae6b32947762c16966018f244af87810199be20aaa2fff43563119841962"
       },
       "review": {
         "kind": "agent-technical",
         "reviewer": "Codex",
-        "reviewedAt": "2026-11-14T14:51:45.522649Z",
+        "reviewedAt": "2026-11-15T08:47:23.125403Z",
         "checks": [
-          "manifest and capability review",
-          "20 English/French and regex script tests",
-          "35 dictionary service and UI regression tests",
-          "restricted dictionary worker input and host API denial tests",
-          "complete package inventory and SHA-256 verification"
+          "20 English/French and regex script regressions pass",
+          "main.js byte-for-byte unchanged; guidance and version updated",
+          "dictionary-only script has no host calls",
+          "51 Node script tests and 28 packaging, private-policy, historical-artifact and signing-guard tests pass",
+          "complete deterministic package file inventory and SHA-256 verification; all seven published artifacts unchanged"
         ]
       }
     },
     {
       "id": "com.modu.web-clipper",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "name": {
         "zh-CN": "网页稍后阅读",
         "en": "Web clipper"
@@ -191,31 +197,27 @@
       "status": "reviewed",
       "sourcePath": "packages/web-clipper",
       "package": {
-        "path": "dist/com.modu.web-clipper-1.1.0.moduplugin",
-        "sha256": "a06f1a3424efddb62bdc12a5a7b2b85b0f216ddf6156609a96673b394e01abad"
+        "path": "dist/com.modu.web-clipper-1.1.1.moduplugin",
+        "sha256": "3bb65c470a0fa260c748c680de7d8a34adbdf1029aa64a84a2175b1928a28b11"
       },
       "files": {
         "LICENSE": "776fdcb645b929da3ec5184f16f9ef1d50ac2094394a1958cb7fd4d1d9a609a1",
-        "README.md": "58cc915418e30c657df16f60fbe8c08afb2d4a50d319411685332c47da52e1a4",
+        "README.md": "5691d83772ae2683e7728c4d230c156437c2c9dcc2a4e6a356398d92fda14e8e",
         "THIRD_PARTY_NOTICES.md": "6bcf62cb523046c530a34ac40515d636bb05d631bc186e00db359a52806c7642",
         "extract.js": "da23162552aeb17c9292d3b8970b0a02528f249ab63561cb5f0cb19220096b1b",
         "main.js": "8a0f90e13534bb2c27b8bcae4a68b9598661a657ee759fef2bf717342fe33d34",
-        "manifest.json": "b3a61e41aa5821765cb774c2ce05c45f51b613933518607f7141e23f47615dfc"
+        "manifest.json": "5d78ad0cc04fe879998e261d3f1e3c33f1826eb436c44fbb8fa6298cedc8c14f"
       },
       "review": {
         "kind": "agent-technical",
         "reviewer": "Codex",
-        "reviewedAt": "2026-11-15T08:00:03.828977Z",
+        "reviewedAt": "2026-11-15T08:47:23.133938Z",
         "checks": [
-          "manifest and capability review: small library launcher plus isolated article extraction",
-          "42 script tests, including 20 web-clipper tests and all six migrated native extraction regression groups",
-          "21 deterministic packaging, host-compatible unique snake-case setting keys, scoped article limits and signing-guard tests",
-          "clean offline locked dependency install reproduces identical Chrome 83-targeted bundle bytes",
-          "six real Chrome 157 CSP Worker smoke cases before setting-key correction; corrected snake-case settings-off case separately verified on final bundle",
-          "anonymous public-article offline smoke: title, body, source preserved with no image fetching or host calls",
-          "pinned Readability, virtual DOM and Markdown dependencies with third-party license notices",
-          "complete package file inventory and SHA-256 verification; all six prior package artifacts unchanged",
-          "native setting key convention mirrored in pack validation; legacy artifacts preserved"
+          "20 web-clipper script regressions pass including all six migrated native extraction groups",
+          "launcher and offline extraction bundle byte-for-byte unchanged; guidance and version updated",
+          "pinned build-only dependencies and third-party licenses retained; no runtime remote dependency",
+          "51 Node script tests and 28 packaging, private-policy, historical-artifact and signing-guard tests pass",
+          "complete deterministic package file inventory and SHA-256 verification; all seven published artifacts unchanged"
         ]
       }
     }

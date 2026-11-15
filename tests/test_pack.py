@@ -43,19 +43,18 @@ class PackageTest(unittest.TestCase):
     def test_catalog_covers_five_reviewed_packages_and_preserves_existing_bytes(self):
         packages = dict(PACK.reviewed_packages(ROOT))
         self.assertEqual(len(packages), 5)
-        expected = {
-            "com.modu.private-books-1.1.0.moduplugin": "667b1b04aa0629c3344163656dd9398ba59c55fd0bb70e26d235a4eefcaacb68",
-            "com.modu.text-tools-1.0.0.moduplugin": "19ec63c7ab15d2b9895ee48c5c46e1493247197e8d3cea29746d34beece0717e",
-            "com.modu.dictionary-transform-1.0.0.moduplugin": "5e57cf9c2e6e988447bc0a7b7d2d446b41496a11eec98575dc7d3327747d8a7e",
-            "com.modu.web-clipper-1.1.0.moduplugin": "a06f1a3424efddb62bdc12a5a7b2b85b0f216ddf6156609a96673b394e01abad",
-        }
-        for name, digest in expected.items():
-            self.assertEqual(hashlib.sha256(packages[name]).hexdigest(), digest)
+        self.assertEqual(set(packages), {
+            "com.modu.private-books-1.2.0.moduplugin", "com.modu.text-tools-1.0.1.moduplugin",
+            "com.modu.dictionary-transform-1.0.1.moduplugin", "com.modu.web-clipper-1.1.1.moduplugin",
+            "com.example.prompt-pack-1.1.1.moduplugin",
+        })
+        for name, data in packages.items():
+            self.assertEqual(data, (ROOT / "dist" / name).read_bytes())
         self.assertEqual(hashlib.sha256((ROOT / "dist" / "com.modu.private-books-1.0.0.moduplugin").read_bytes()).hexdigest(),
                          "ce459c352a302b3dc1b7e5b3fade872c5dec3ef53a533747674bb4b038b0eba4")
         self.assertEqual(hashlib.sha256((ROOT / "dist" / "com.modu.web-clipper-1.0.0.moduplugin").read_bytes()).hexdigest(),
                          "4cf337b9f425b58bfc375fa43b64f86c5b2298d316a00e371e0866bb69e300f9")
-        with zipfile.ZipFile(io.BytesIO(packages["com.example.prompt-pack-1.1.0.moduplugin"])) as archive:
+        with zipfile.ZipFile(ROOT / "dist/com.example.prompt-pack-1.1.0.moduplugin") as archive:
             original = {
                 "manifest.json": "405941bfa8f15fef6a5fa7b6d6628da357733f84faa919c6676699bdcc730fbe",
                 "README.md": "dc7a53ee926b20a087fb1240db0051af274a7aa46650223e1ef2db54335fb729",
@@ -63,23 +62,22 @@ class PackageTest(unittest.TestCase):
             }
             self.assertEqual({name: hashlib.sha256(archive.read(name)).hexdigest() for name in archive.namelist()}, original)
 
-    def test_private_books_menu_is_declarative_and_preserves_script_entries(self):
+    def test_private_books_declare_device_preferences_import_and_generic_menu_controls(self):
         name, data = PACK.package_bytes(ROOT / "packages" / "private-books")
-        self.assertEqual(name, "com.modu.private-books-1.1.0.moduplugin")
+        self.assertEqual(name, "com.modu.private-books-1.2.0.moduplugin")
         with zipfile.ZipFile(io.BytesIO(data)) as archive:
             manifest = json.loads(archive.read("manifest.json"))
-            self.assertEqual(set(manifest["capabilities"]), {"script:run", "library:private", "ui:book-action"})
+            self.assertEqual(set(manifest["capabilities"]), {"script:run", "library:private", "ui:book-action", "library:private-control", "library:private-policy", "settings:device"})
             scripts = [action for action in manifest["contributes"] if action["kind"] == "scriptAction"]
-            self.assertEqual([(action["id"], action["entry"]) for action in scripts], [("open", "main.js"), ("lock", "main.js")])
-            self.assertEqual(hashlib.sha256(archive.read("main.js")).hexdigest(),
-                             "bc2994699ee7a5efcf98ef0f9b5bf93470389225e91b39538b452576c4a07229")
-            self.assertEqual([action for action in manifest["contributes"] if action["kind"] == "bookAction"], [{
-                "kind": "bookAction", "schema": 1, "id": "hide", "name": {"zh-CN": "隐藏", "en": "Hide"}, "command": "privateLibrary.hide"
-            }])
+            self.assertEqual([(action["id"], action["entry"]) for action in scripts], [("open", "main.js"), ("lock", "main.js"), ("add", "main.js"), ("remove", "main.js"), ("import-policy", "import.js")])
+            self.assertEqual([(setting["key"], setting["storage"], setting["defaultValue"]) for setting in manifest["settings"]],
+                             [("private_only", "device", False), ("auto_import", "device", False), ("lock_after_hide", "device", True)])
+            self.assertEqual([(action["id"], action["command"], action["private"], action["when"]) for action in manifest["contributes"] if action["kind"] == "bookAction"],
+                             [("hide", "privateLibrary.setPrivate", True, "public"), ("restore", "privateLibrary.setPrivate", False, "private")])
 
     def test_web_clipper_keeps_its_small_launcher_and_bundles_scoped_offline_extraction(self):
         name, data = PACK.package_bytes(ROOT / "packages" / "web-clipper")
-        self.assertEqual(name, "com.modu.web-clipper-1.1.0.moduplugin")
+        self.assertEqual(name, "com.modu.web-clipper-1.1.1.moduplugin")
         with zipfile.ZipFile(io.BytesIO(data)) as archive:
             self.assertEqual(set(archive.namelist()), {"LICENSE", "README.md", "THIRD_PARTY_NOTICES.md", "main.js", "extract.js", "manifest.json"})
             manifest = json.loads(archive.read("manifest.json"))

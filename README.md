@@ -6,13 +6,22 @@
 
 [GitHub](https://github.com/sobranie2406/modu-plugin) · [Gitee 镜像](https://gitee.com/sobranie2406/modu-plugin)
 
+## 开发与更新约定
+
+- 插件负责自己的功能规则、算法、网站适配、依赖和配置，这些内容随插件包独立更新。
+- 默读提供稳定、可复用的底层接口，负责隔离执行、权限校验和数据安全；不按插件 ID 编写专属功能分支。
+- 使用现有接口的功能升级只更新插件。确需新增底层能力时，声明所需能力并保持旧调用兼容。
+- 权限和执行额度按实际功能申请，经审核、用户确认和宿主能力协商后使用。
+- 插件的功能入口和设置放在插件页；书籍和阅读菜单只注册动作。证书、账号密钥和本机配置不得打入插件包。
+- 发布新版本并签名上架，保留旧版安装包，不替换同版本的文件。具体接口和调试方式见[开发规范](DEVELOPMENT.md)。
+
 | 插件 | 用途 | 权限 | 默读版本 |
 | --- | --- | --- | --- |
-| 私密书籍 | 隐藏书籍、管理与锁定私密书籍 | 脚本执行、私密书籍管理、书籍菜单 | 1.3.10+ |
+| 私密书籍 | 管理私密书籍，设置显示、导入和隐藏规则 | 脚本执行、私密管理与策略、书籍菜单、本机设置 | 1.3.10+ |
 | 文字整理 | 整理所选文字的空格和换行 | 脚本执行、划词动作 | 1.3.10+ |
 | 查词预处理 | 原词未命中时尝试英语词形、法语前缀和正则规则 | 脚本执行、查词变体 | 1.3.10+ |
 | 网页稍后阅读 | 识别网页正文和元数据，导出 Markdown 或加入书架 | 脚本执行、指定网页采集、离线正文提取 | 1.3.10+ |
-| 示例提示词包 | 两个提示词模板与一个划词动作 | AI 提示词、划词动作 | 1.3.1+ |
+| 示例提示词包 | 两个可配置提示词模板与一个划词动作 | AI 提示词、划词动作 | 1.3.10+ |
 
 插件不随默读安装。在「设置 → 插件」打开「启用插件」，再下载安装，或导入下载好的 `.moduplugin`。
 插件页面会自动加载已审核目录，提供下载安装、权限预览和确认。
@@ -29,20 +38,21 @@
 
 ## 下载
 
-- [私密书籍 1.1.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.private-books-1.1.0.moduplugin)
-- [文字整理 1.0.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.text-tools-1.0.0.moduplugin)
-- [查词预处理 1.0.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.dictionary-transform-1.0.0.moduplugin)
-- [网页稍后阅读 1.1.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.web-clipper-1.1.0.moduplugin)
-- [示例提示词包 1.1.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.example.prompt-pack-1.1.0.moduplugin)
+- [私密书籍 1.2.0](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.private-books-1.2.0.moduplugin)
+- [文字整理 1.0.1](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.text-tools-1.0.1.moduplugin)
+- [查词预处理 1.0.1](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.dictionary-transform-1.0.1.moduplugin)
+- [网页稍后阅读 1.1.1](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.modu.web-clipper-1.1.1.moduplugin)
+- [示例提示词包 1.1.1](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/com.example.prompt-pack-1.1.1.moduplugin)
 - [SHA-256 校验](https://raw.githubusercontent.com/sobranie2406/modu-plugin/main/dist/SHA256SUMS)
 
 GitHub 访问不畅时，可从 [Gitee 文件目录](https://gitee.com/sobranie2406/modu-plugin/tree/main/dist) 下载同名插件包；[签名清单镜像](https://gitee.com/sobranie2406/modu-plugin/raw/main/catalog.json) 与 GitHub 保持一致。
 
 ## 使用
 
-- **私密书籍**：启用后，长按书籍选择「隐藏」；在私密书籍中查看或移出书籍。安装页提示更新时，请先更新默读。
+- **私密书籍**：启用后，长按书籍选择「隐藏」；在插件详情查看、加入、移出或锁定书籍，并设置显示范围、导入规则和隐藏后锁定。设置和私密资料仅保存在本机。
+- **示例提示词包**：启用摘要、追问与划词解释，在插件设置中调整语气、字数和原文引用，运行时使用当前设置。
 - **查词预处理**：启用后自动参与查词，保留原词命中的结果；在插件设置中调整英语、法语和自定义正则规则。参见[规则示例](packages/dictionary-transform/README.md)。感谢 [@zhuhui-in](https://github.com/zhuhui-in) 提出的 [#83](https://github.com/sobranie2406/modureader/issues/83)。
-- **网页稍后阅读**：打开插件详情中的同名动作，输入网址，获取正文后预览，再导出 Markdown 或加入书架。插件设置可选择保留作者、日期和图片链接；正文算法随插件独立更新。1.1.0 需要支持 `article:extract` 的默读版本。
+- **网页稍后阅读**：打开插件详情中的同名动作，输入网址，获取正文后预览，再导出 Markdown 或加入书架。插件设置可选择保留作者、日期和图片链接；正文算法随插件独立更新，需要宿主支持 `article:extract`。
 
 ## 打包
 
@@ -86,7 +96,9 @@ python3 scripts/sign_catalog.py --private-key /protected/path/catalog-key.pem
 
 `article:extract` 声明 `surface: "article"` 的离线动作，接收 `{html, url, plainText, settings, actionId}`，返回 `{title, markdown}`。正文识别、清理和转换都在插件内运行，不能调用宿主接口；宿主负责受控下载、预览和保存。
 
-`bookAction` 是书籍长按菜单中的声明式动作，不执行 JavaScript。`privateLibrary.hide` 由默读处理，需要 `ui:book-action` 和 `library:private` 权限。
+`bookAction` 是书籍长按菜单中的声明式动作，不执行 JavaScript。`privateLibrary.setPrivate` 声明加入或移出私密书籍，可用 `when` 指定显示条件、`lockAfterSetting` 读取同包开关；需要书籍菜单、私密管理与控制权限。旧包的 `privateLibrary.hide` 保持兼容。
+
+`surface: "bookImport"` 的导入策略接收书籍摘要与插件设置，返回 `{private: true/false}`，不调用宿主接口。`enabledSetting` 可指定开关，关闭时不运行脚本。设备设置声明 `storage: "device"` 和 `settings:device`，不参与同步。
 
 宿主只开放已声明并经用户授权的接口。插件不直接访问文件、数据库、账号密钥或阅读器页面。
 

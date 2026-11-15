@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "hostApi": 1,
   "id": "com.modu.dictionary-transform",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": {
     "zh-CN": "查词预处理",
     "en": "Dictionary word forms"

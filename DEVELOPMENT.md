@@ -9,16 +9,26 @@
 - 书籍和阅读菜单只注册操作入口；未安装或未启用插件时不显示。
 - 配置使用 manifest 的 `settings`；密码、文件和数据库操作由宿主接口处理。
 
-书籍菜单动作使用 `bookAction`，目前的 `privateLibrary.hide` 需要同时声明 `ui:book-action` 和 `library:private`。该动作不执行脚本，宿主只处理用户选中的书籍。
+书籍菜单动作使用 `bookAction`，`privateLibrary.setPrivate` 用 `private` 指定加入或移出、`when` 指定普通或私密书籍、`lockAfterSetting` 引用同包开关。需要 `ui:book-action`、`library:private` 和 `library:private-control`；该动作不执行脚本，宿主只处理用户选中的书籍。旧包的 `privateLibrary.hide` 继续兼容。
 
 ## 独立更新
 
 - 插件功能原则上随插件独立更新，算法、网站适配、功能规则、依赖和配置放在插件包内。
-- 宿主提供稳定、可复用的通用接口。只有缺少底层能力时才扩展，保留旧调用兼容，不按插件 ID 写功能分支。
+- 插件负责完整的功能处理逻辑；宿主提供稳定、可复用的底层接口及隔离执行、权限和数据安全检查。只有缺少底层能力时才扩展，保留旧调用兼容，不按插件 ID 写功能分支。
 - 插件可按实际需要声明权限与执行额度，经审核、用户确认和宿主能力协商后使用。
 - 使用现有宿主能力的更新无需升级默读；新增宿主能力才要求更新应用。
+- 证书、私钥、账号密钥、本机配置和用户资料不进包。默认设置在 manifest 中声明，实际设置由宿主保存。
+- 每次发布增加插件版本号；源码、包内依赖、许可和审核记录一同更新，旧包保持原字节。
+
+声明式提示词可直接使用 `{setting.<key>}`，运行时读取当前插件设置。例如 `{setting.tone}`、`{setting.quote_original}`、`{setting.max_words}`；设置键使用小写字母、数字和下划线，声明的配置应实际参与功能。
 
 网页正文处理使用 `article:extract`：一个 `scriptAction` 声明 `surface: "article"`、`scope: "selection"`，接收原始 HTML、来源 URL、纯文本标记和插件设置，返回标题与 Markdown。该动作不能调用宿主接口；正文算法、清理规则和 HTML/Markdown 依赖均放在插件内。宿主只负责受控获取、隔离执行、预览和保存。
+
+私密管理脚本可使用 `modu.privateLibrary.selectBooks({private: true/false})`，再对本次用户选择的 ID 调用 `setPrivate({bookIds, private, lockAfter})`。`open()`、`lock()` 保持兼容；`state()` 与 `updateOptions()` 提供已授权的本机状态和选项操作，PIN 与身份校验由宿主处理。
+
+导入策略使用 `scriptAction` 的 `surface: "bookImport"`、`scope: "selection"`，声明 `library:private-policy`。输入为 `{book: {id, title, author, format}, settings, actionId}`，返回 `{private: true/false}`，不允许调用宿主接口。`enabledSetting` 引用同包 toggle，关闭时跳过脚本；规则在插件中处理，保存和同步隔离由宿主执行。
+
+本机设置声明 `storage: "device"` 并申请 `settings:device`。私密选项可用 toggle 绑定 `privateLibrary.privateOnly`、`privateLibrary.autoImport` 或 `privateLibrary.lockAfterHide`，另需 `library:private-control` 与 `library:private`。绑定沿用已有本机值，设置不进入同步或外发备份。
 
 ## 实机调试
 

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "hostApi": 1,
   "id": "com.modu.text-tools",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": {"zh-CN": "文字整理", "en": "Text cleanup"},
   "description": {"zh-CN": "整理所选文字的空格和换行。", "en": "Tidy spaces and line breaks in selected text."},
   "author": {"name": "Modu"},

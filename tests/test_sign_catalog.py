@@ -81,7 +81,7 @@ class CatalogSignatureTest(unittest.TestCase):
         self.assertFalse((self.root / "catalog.json").exists())
 
     def test_changed_dist_package_is_rejected(self):
-        package = self.root / "dist/com.modu.text-tools-1.0.0.moduplugin"
+        package = self.root / "dist/com.modu.text-tools-1.0.1.moduplugin"
         package.write_bytes(package.read_bytes() + b"changed")
         with self.assertRaises(ValueError):
             self.sign()

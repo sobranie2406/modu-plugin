@@ -1,45 +1,9 @@
-# Example prompt pack
+# 示例提示词包
 
-This is a sample Modu plugin. It contains no executable code: `manifest.json`
-declares two `aiSkill` contributions, one `selectionAction`, and a small set of
-plugin settings. Modu materialises the prompt templates in the AI prompt picker
-and the selection action in the selection toolbar.
+启用后，AI 提示词中会出现「深度摘要」和「苏格拉底提问」，划词工具栏中会出现「简明解释」。
 
-## Build and install
+在插件设置中调整回答语气、最大字数和是否引用原文。三个动作都会在运行时使用当前设置；默认简洁表达，最多 300 字，不引用原文。
 
-From the repository root:
+提示词使用 `{setting.tone}`、`{setting.max_words}`、`{setting.quote_original}`，划词动作另用 `{selection}`。修改提示词或默认设置时，增加插件版本号，审核后即可独立更新。
 
-```bash
-dart run scripts/dev/pack_plugin.dart docs/examples/plugins/prompt-pack
-```
-
-The command writes `prompt-pack-1.1.0.moduplugin` next to the source directory.
-Open **Settings → Experimental features**, confirm the plugin warning,
-then open **Manage plugins → Install plugin…** and select that
-file. The two templates then appear in the AI prompt picker, and the selection
-action appears in the selection toolbar. Disabling or uninstalling the plugin
-removes the contributions it added.
-
-## What is included
-
-- `deep-summary` and `socratic-questions`: AI prompt templates.
-- `explain-selection`: a selection-toolbar AI command using `{selection}`.
-- Settings: a select, a toggle, a number and a help-only tip. They demonstrate
-  the plugin settings form and settings backup. This declarative sample does
-  not execute code, so the values are stored but do not change the prompts yet.
-
-## Customise
-
-Modified packages cannot be installed until the project reviews them and ships
-their exact ID, version and file SHA-256 fingerprints in its built-in trusted
-catalog. Neither an official-looking author URL nor a matching package name
-grants trust. To change a prompt for personal use, edit its ordinary AI skill
-instead of modifying the package.
-
-## Notes
-
-- The package must stay under 5 MB compressed and 20 MB extracted.
-- Every contribution needs a unique, lowercase `id`.
-- Selection actions share the 24 custom-toolbar slots with your own commands.
-- This repository sample is released under CC0-1.0 and is the initial reviewed
-  catalog entry. It is experimental, not a guarantee that AI output is safe.
+本包没有执行脚本，使用 CC0-1.0 许可。安装、设置和开发方式见[插件开发规范](https://github.com/sobranie2406/modu-plugin/blob/main/DEVELOPMENT.md)。
